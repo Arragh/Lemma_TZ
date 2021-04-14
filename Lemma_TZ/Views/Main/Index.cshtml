@@ -1,0 +1,83 @@
+﻿@model IQueryable<Todo>
+
+@{
+    ViewData["Title"] = "Список задач";
+}
+
+<div class="m-1 p-2">
+    <form asp-action="Index" method="get" class="form-inline">
+        <label class="m-1">Дата начала:</label>
+        <input type="date" name="startDate" value="@ViewBag.StartDate" />
+
+        <label class="m-1">Дата завершения:</label>
+        <input type="date" name="endDate" value="@ViewBag.EndDate" />
+
+        <label class="m-1">Минимальный приоритет:</label>
+        <input type="number" min="1" max="5" name="minPriority" value="@ViewBag.MinPriority" />
+
+        <label class="m-1">Максимальный приоритет:</label>
+        <input type="number" min="1" max="5" name="maxPriority" value="@ViewBag.MaxPriority" />
+
+        <label class="m-1">
+            <input class="form-check-input" type="checkbox" name="onlyUnComplete" value="true" checked="@(ViewBag.OnlyUnComplete == true)" />
+            Только незавершенные
+        </label>
+
+        <label class="m-1">Упорядочить по:</label>
+        <select name="orderValue" class="form-control">
+            <option value="">---</option>
+            <option value="name" selected="@(ViewBag.OrderValue == "name")">Название</option>
+            <option value="customer" selected="@(ViewBag.OrderValue == "customer")">Заказчик</option>
+            <option value="performer" selected="@(ViewBag.OrderValue == "performer")">Исполнитель</option>
+            <option value="startDate" selected="@(ViewBag.OrderValue == "startDate")">Дата начала</option>
+            <option value="endDate" selected="@(ViewBag.OrderValue == "endDate")">Дата окончания</option>
+            <option value="priority" selected="@(ViewBag.OrderValue == "priority")">Приоритет</option>
+            <option value="status" selected="@(ViewBag.OrderValue == "status")">Статус</option>
+        </select>
+
+        <button class="btn btn-primary m-1">Отфильтровать</button>
+    </form>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+        <tr>
+            <th>Название задачи</th>
+            <th>Отдел-заказчик</th>
+            <th>Отдел-исполнитель</th>
+            <th>Дата начала</th>
+            <th>Дата окончания</th>
+            <th>Приоритет</th>
+            <th>Статус</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var todo in Model)
+        {
+            <tr>
+                <td>@todo.Name</td>
+                <td>@todo.CustomerName</td>
+                <td>@todo.PerformerName</td>
+                <td>@todo.StartDate.ToString()</td>
+                <td>@todo.EndDate.ToString()</td>
+                <td>@todo.Priority</td>
+                <td>@(todo.IsComplete ? "Завершена" : "В работе")</td>
+                <td>
+                    <form asp-action="DeleteTask" asp-controller="Todo" asp-route-todoId="@todo.TodoId" method="post">
+                        @if (!todo.IsComplete)
+                        {
+                            <a asp-action="EditTask" asp-controller="Todo" asp-route-todoId="@todo.TodoId" class="btn btn-warning">Изменить</a>
+                        }
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="text-center">
+    <a asp-action="AddTask" asp-controller="Todo" class="btn btn-primary">Создать новую задачу</a>
+    <a asp-action="Index" asp-controller="Employee" class="btn btn-outline-primary">Список сотрудников</a>
+</div>
